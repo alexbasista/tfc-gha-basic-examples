@@ -1,0 +1,40 @@
+name: Terraform Plan + Apply
+
+on:
+  #pull_request:
+  workflow_dispatch:
+
+# env:
+#   tf_actions_working_dir: ./
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    env:
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }} # TFC API token
+      TF_WORKSPACE: gha-cli-test # workspace name
+      TF_CONFIG_DIR: ./ # path to Terraform files
+    
+    defaults:
+      run:
+        working-directory: ${{ env.TF_CONFIG_DIR }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan
+      
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
