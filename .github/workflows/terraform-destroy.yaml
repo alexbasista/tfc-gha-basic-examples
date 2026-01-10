@@ -2,11 +2,6 @@ name: Terraform Plan + Destroy
 
 on:
   workflow_dispatch:
-    inputs:
-      confirm_destroy:
-        description: 'Type "DESTROY" to confirm'
-        required: true
-        default: ""
 
 jobs:
   terraform:
@@ -14,7 +9,7 @@ jobs:
 
     env:
       TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }} # TFC API token
-      TF_WORKSPACE: gha-cli-test                                          # Workspace name
+      TF_WORKSPACE: gha-cli-test                                          # workspace name
       TF_CONFIG_DIR: ./                                                   # path to Terraform files
 
     defaults:
@@ -27,13 +22,6 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-
-      - name: Confirm Destroy
-        run: |
-          if [ "${{ inputs.confirm_destroy }}" != "DESTROY" ]; then
-            echo "Refusing to run destroy. Set confirm_destroy to DESTROY."
-            exit 1
-          fi
 
       - name: Terraform Init
         run: terraform init -input=false
