@@ -1,4 +1,4 @@
-name: Terraform Plan + Destroy (CLI-driven)
+name: Terraform Destroy (CLI-driven)
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ jobs:
     env:
       TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }} # TFC API token
       TF_CONFIG_DIR: ./                                                   # Path to Terraform files
-      TF_WORKSPACE: gha-cli-test                                          # Workspace name
+      TF_WORKSPACE: gha-cli-driven-test                                   # Workspace name
 
     defaults:
       run:
