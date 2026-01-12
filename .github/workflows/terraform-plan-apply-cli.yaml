@@ -1,17 +1,17 @@
-name: Terraform Plan + Destroy
+name: Terraform Plan + Apply (CLI-driven)
 
 on:
   workflow_dispatch:
 
 jobs:
-  terraform:
+  terraform-cli-run:
     runs-on: ubuntu-latest
 
     env:
       TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }} # TFC API token
-      TF_WORKSPACE: gha-cli-test                                          # workspace name
-      TF_CONFIG_DIR: ./                                                   # path to Terraform files
-
+      TF_CONFIG_DIR: ./                                                   # Path to Terraform files
+      TF_WORKSPACE: gha-cli-test                                          # Workspace name
+    
     defaults:
       run:
         working-directory: ${{ env.TF_CONFIG_DIR }}
@@ -29,8 +29,8 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
-      - name: Terraform Plan (Destroy)
-        run: terraform plan -destroy -input=false
-
-      - name: Terraform Destroy
-        run: terraform destroy -auto-approve -input=false
+      - name: Terraform Plan
+        run: terraform plan
+      
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
