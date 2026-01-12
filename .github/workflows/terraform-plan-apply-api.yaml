@@ -1,0 +1,45 @@
+name: Terraform Plan + Apply (API-driven)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  terraform-api-run:
+    runs-on: ubuntu-latest
+
+    env:
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }} # TFC API token
+      TF_CLOUD_ORGANIZATION: abasista-tfc                                 # TFC organization name
+      TF_CONFIG_DIR: ./                                                   # Path to Terraform files
+      TF_WORKSPACE: gha-api-test                                          # Workspace name
+
+    defaults:
+      run:
+        working-directory: ${{ env.TF_CONFIG_DIR }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Upload TF config to workspace
+        id: upload-tf-config
+        uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.3.1
+        with:
+          workspace: ${{ env.TF_WORKSPACE }}
+          directory: ${{ env.TF_CONFIG_DIR }}
+        
+      - name: Terraform plan
+        id: create-run
+        uses: hashicorp/tfc-workflows-github/actions/create-run@v1.3.1
+        with:
+          workspace: ${{ env.TF_WORKSPACE }}
+          configuration_version: ${{ steps.upload-tf-config.outputs.configuration_version_id }}
+
+      - name: Terraform apply
+        id: apply-run  
+        uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.3.1
+        if: ${{ fromJSON(steps.create-run.outputs.payload).data.attributes.actions.IsConfirmable }}
+        with:
+          run: ${{ steps.create-run.outputs.run_id }}
+          comment: "Apply run from ${{ github.sha }}"
+        

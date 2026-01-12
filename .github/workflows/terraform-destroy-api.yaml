@@ -1,0 +1,36 @@
+name: Terraform Plan + Destroy (API-driven)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  terraform-destroy-run:
+    runs-on: ubuntu-latest
+
+    env:
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }} # TFC API token
+      TF_CONFIG_DIR: ./                                                   # Path to Terraform files
+      TF_WORKSPACE: gha-cli-test                                          # Workspace name
+
+    defaults:
+      run:
+        working-directory: ${{ env.TF_CONFIG_DIR }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan (Destroy)
+        run: terraform plan -destroy -input=false
+
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve -input=false
