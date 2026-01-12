@@ -27,3 +27,11 @@ jobs:
         with:
           workspace: ${{ env.TF_WORKSPACE }}
           is_destroy: true
+
+      - name: Terraform destroy (apply)
+        id: apply-destroy-run 
+        uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.3.1
+        if: ${{ fromJSON(steps.create-destroy-run.outputs.payload).data.attributes.actions.IsConfirmable }}
+        with:
+          run: ${{ steps.create-destroy-run.outputs.run_id }}
+          comment: "Confirming Terraform destroy on ${{ steps.create-destroy-run.outputs.run_id }}"
